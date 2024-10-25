@@ -1,28 +1,22 @@
 <?php
 
-// app/Http/Controllers/AlunoController.php
-
 namespace App\Http\Controllers;
 
 use App\Models\Aluno;
+use App\Models\CategoriaFormacao;
 use Illuminate\Http\Request;
+use Storage;
 
 class AlunoController extends Controller
 {
-    public function index(Request $request)
+    function index()
     {
-        $query = Aluno::query();
-        if ($request->has('txt_pesquisa')) {
-            $search = $request->get('txt_pesquisa');
-            $query->where('nomeAluno', 'like', "%{$search}%")
-                  ->orWhere('telefoneAluno', 'like', "%{$search}%")
-                  ->orWhere('cpfAluno', 'like', "%{$search}%")
-                  ->orWhere('turma', 'like', "%{$search}%");
-        }
-        $dados = $query->paginate(10);
+        //select * from
+        $dados = Aluno::All();
 
-
-        return view('alunos.list', compact('dados'));
+        return view('alunos.list', [
+            'dados' => $dados
+        ]);
     }
 
     public function create()
@@ -30,44 +24,78 @@ class AlunoController extends Controller
         return view('alunos.create');
     }
 
-    public function store(Request $request)
+    function store(Request $request)
     {
-        $request->validate([
-            'nomeAluno' => 'required|string',
-            'cpfAluno' => 'required|string',
-            'telefoneAluno' => 'required|string',
-            'notaAluno' => 'required|numeric',
-            'turma' => 'required|string',
-        ]);
+        $request->validate(
+            [
+                'nome' => 'required|max:130|min:3',
+                'cpf' => 'required|max:14',
+                'telefone' => 'required|max:20',
+                'nota' => 'required|max:3',
+            ],
+            [
+                'nome.required' => " O :attribute é obrigatório",
+                'nome.max' => " O máximo de caracteres para :attribute é 130",
+                'nome.min' => " O mínimo de caracteres para :attribute é 3",
+                'cpf.required' => " O :attribute é obrigatório",
+                'cpf.max' => " O máximo de caracteres para :attribute é 14",
+                'telefone.required' => " O :attribute é obrigatório",
+                'telefone.max' => " O máximo de caracteres para :attribute é 20",
+                'nota.required' => " O :attribute é obrigatório",
+                'nota.max' => " O máximo de caracteres para :attribute é 3",
+            ]
+        );
 
-        Aluno::create($request->all());
+        $data = $request->all();
 
-        return redirect()->route('alunos.list')->with('success', 'Aluno adicionado com sucesso.');
+        Aluno::create($data);
+
+        return redirect('aluno');
     }
 
-    public function edit(Aluno $aluno)
+    function update(Request $request, $id)
     {
-        return view('alunos.edit', compact('aluno'));
+        $request->validate(
+            [
+                'nome' => 'required|max:130|min:3',
+                'cpf' => 'required|max:14',
+                'telefone' => 'required|max:20',
+                'nota' => 'required|max:3',
+            ],
+            [
+                'nome.required' => " O :attribute é obrigatório",
+                'nome.max' => " O máximo de caracteres para :attribute é 130",
+                'nome.min' => " O mínimo de caracteres para :attribute é 3",
+                'cpf.required' => " O :attribute é obrigatório",
+                'cpf.max' => " O máximo de caracteres para :attribute é 14",
+                'telefone.required' => " O :attribute é obrigatório",
+                'telefone.max' => " O máximo de caracteres para :attribute é 20",
+                'nota.required' => " O :attribute é obrigatório",
+                'nota.max' => " O máximo de caracteres para :attribute é 3",
+            ]
+        );
+
+        $data = $request->all();
+
+        Aluno::updateOrCreate(
+            ['id' => $id],
+            $data
+        );
+
+        return redirect('aluno');
     }
 
-    public function update(Request $request, Aluno $aluno)
+    public function search(Request $request)
     {
-        $request->validate([
-            'nomeAluno' => 'required|string',
-            'cpfAluno' => 'required|string',
-            'telefoneAluno' => 'required|string',
-            'notaAluno' => 'required|numeric',
-            'turma' => 'required|string',
-        ]);
-
-        $aluno->update($request->all());
-
-        return redirect()->route('alunos.list')->with('success', 'Aluno atualizado com sucesso.');
-    }
-
-    public function destroy(Aluno $aluno)
-    {
-        $aluno->delete();
-        return redirect()->route('alunos.list')->with('success', 'Aluno excluído com sucesso.');
+        if (!empty($request->valor)) {
+            $dados = Aluno::where(
+                $request->tipo,
+                'like',
+                "%$request->valor%"
+            )->get();
+        } else {
+            $dados = Aluno::All();
+        }
+        return view('alunos.list', ['dados' => $dados]);
     }
 }

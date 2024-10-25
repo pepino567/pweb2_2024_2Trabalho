@@ -1,37 +1,69 @@
-@extends('layouts.app')
+@extends('base')
+@section('titulo', 'Formulário Aluno')
+@section('conteudo')
+    <h3>Formulário Aluno</h3>
 
-@section('content')
-<header>
-    <h3><i class="bi bi-person-plus-fill"></i> {{ $action === 'atualizar' ? 'Editar Aluno' : 'Cadastro de Aluno' }}</h3>
-</header>
+    @php
+        if (!empty($dado->id)) {
+            $route = route('aluno.update', $dado->id);
+        } else {
+            $route = route('aluno.store');
+        }
+    @endphp
 
-<form action="{{ $action === 'atualizar' ? route('aluno.update', $aluno->idAlunos) : route('aluno.store') }}" method="post">
-    @csrf
-    @if($action === 'atualizar')
-        @method('PUT')
-    @endif
-    <div class="form-group">
-        <label for="nomeAluno">Nome:</label>
-        <input type="text" class="form-control" id="nomeAluno" name="nomeAluno" value="{{ old('nomeAluno', $aluno->nomeAluno ?? '') }}" required>
+    <div class="row">
+
+        <form action="{{ $route }}" method="post" enctype="multipart/form-data">
+            <!-- csrf camada de segurança-->
+            @csrf
+
+            @if (!empty($dado->id))
+                @method('put')
+            @endif
+
+            <input type="hidden" name="id"
+                value="@if (!empty($dado->id)) {{ $dado->id }}
+            @else{{ '' }} @endif">
+
+            <div class="col-6">
+                <label class="form-label">Nome</label><br>
+                <input type="text" name="nome" class="form-control"
+                    value="@if (!empty($dado->nome)) {{ $dado->nome }}
+                    @elseif (!empty(old('nome'))){{ old('nome') }}
+                    @else{{ '' }} @endif"><br>
+            </div>
+
+            <div class="col-6">
+                <label class="form-label">CPF</label><br>
+                <input type="text" name="cpf" class="form-control"
+                    value="@if (!empty($dado->cpf)) {{ $dado->cpf }}
+                @elseif (!empty(old('cpf'))){{ old('cpf') }}
+                @else{{ '' }} @endif"><br>
+            </div>
+
+            <div class="col-6">
+                <label class="form-label">Telefone</label><br>
+                <input type="text" name="telefone" class="form-control"
+                    value="@if (!empty($dado->telefone)) {{ $dado->telefone }}
+                @elseif (!empty(old('telefone'))){{ old('telefone') }}
+                @else{{ '' }} @endif"><br>
+            </div>
+
+            <div class="col-6">
+                <label class="form-label">Nota</label><br>
+                <input type="text" name="notaAluno" class="form-control"
+                    value="@if (!empty($dado->notaAluno)) {{ $dado->notaAluno }}
+                @elseif (!empty(old('notaAluno'))){{ old('notaAluno') }}
+                @else{{ '' }} @endif"><br>
+            </div>
+
+
+            <div class="col-6">
+                <button type="submit" class="btn btn-success">Salvar</button>
+                <a href="{{ url('aluno') }}" class="btn btn-light">Voltar</a></button>
+            </div>
+        </form>
+
     </div>
-    <div class="form-group">
-        <label for="cpfAluno">CPF:</label>
-        <input type="text" class="form-control" id="cpfAluno" name="cpfAluno" value="{{ old('cpfAluno', $aluno->cpfAluno ?? '') }}" required>
-    </div>
-    <div class="form-group">
-        <label for="telefoneAluno">Telefone:</label>
-        <input type="text" class="form-control" id="telefoneAluno" name="telefoneAluno" value="{{ old('telefoneAluno', $aluno->telefoneAluno ?? '') }}" required>
-    </div>
-    <div class="form-group">
-        <label for="notaAluno">Nota:</label>
-        <input type="number" class="form-control" id="notaAluno" name="notaAluno" value="{{ old('notaAluno', $aluno->notaAluno ?? '') }}" required>
-    </div>
-    <div class="form-group">
-        <label for="turma">Turma:</label>
-        <input type="text" class="form-control" id="turma" name="turma" value="{{ old('turma', $aluno->turma ?? '') }}" required>
-    </div>
-    <div class="mb-3">
-        <input class="btn btn-success" type="submit" value="{{ $action === 'atualizar' ? 'Atualizar' : 'Adicionar' }}">
-    </div>
-</form>
-@endsection
+
+@stop

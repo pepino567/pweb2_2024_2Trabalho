@@ -1,37 +1,85 @@
-@extends('layouts.app')
+@extends('base')
+@section('titulo', 'Formulário Aluno')
+@section('conteudo')
+    <h3>Formulário Evento</h3>
 
-@section('content')
-<header>
-    <h3><i class="bi bi-person-plus-fill"></i> {{ $action === 'atualizar' ? 'Editar Aluno' : 'Cadastro de Aluno' }}</h3>
-</header>
+    @php
+        if (!empty($dado->id)) {
+            $route = route('evento.update', $dado->id);
+        } else {
+            $route = route('evento.store');
+        }
+    @endphp
 
-<form action="{{ $action === 'atualizar' ? route('aluno.update', $aluno->idAlunos) : route('aluno.store') }}" method="post">
-    @csrf
-    @if($action === 'atualizar')
-        @method('PUT')
-    @endif
-    <div class="form-group">
-        <label for="nomeAluno">Nome:</label>
-        <input type="text" class="form-control" id="nomeAluno" name="nomeAluno" value="{{ old('nomeAluno', $aluno->nomeAluno ?? '') }}" required>
+    <div class="row">
+
+        <form action="{{ $route }}" method="post" enctype="multipart/form-data">
+            <!-- csrf camada de segurança-->
+            @csrf
+
+            @if (!empty($dado->id))
+                @method('put')
+            @endif
+
+            <input type="hidden" name="id"
+                value="@if (!empty($dado->id)) {{ $dado->id }}
+            @else{{ '' }} @endif">
+
+            <div class="col-6">
+                <label class="form-label">Evento</label><br>
+                <input type="text" name="tituloEvento" class="form-control"
+                    value="@if (!empty($dado->tituloEvento)) {{ $dado->tituloEvento }}
+                    @elseif (!empty(old('tituloEvento'))){{ old('tituloEvento') }}
+                    @else{{ '' }} @endif"><br>
+            </div>
+
+            <div class="col-6">
+                <label class="form-label">Descrição</label><br>
+                <input type="text" name="descricaoEvento" class="form-control"
+                    value="@if (!empty($dado->descricaoEvento)) {{ $dado->descricaoEvento }}
+                @elseif (!empty(old('descricaoEvento'))){{ old('descricaoEvento') }}
+                @else{{ '' }} @endif"><br>
+            </div>
+
+            <div class="col-6">
+                <label class="form-label">Data Inicio Evento</label><br>
+                <input type="text" name="dataInicioEvento" class="form-control"
+                    value="@if (!empty($dado->dataInicioEvento)) {{ $dado->dataInicioEvento }}
+                @elseif (!empty(old('dataInicioEvento'))){{ old('dataInicioEvento') }}
+                @else{{ '' }} @endif"><br>
+            </div>
+
+            <div class="col-6">
+                <label class="form-label">Hora Inicio Evento</label><br>
+                <input type="text" name="horaInicioEvento" class="form-control"
+                    value="@if (!empty($dado->horaInicioEvento)) {{ $dado->horaInicioEvento }}
+                @elseif (!empty(old('horaInicioEvento'))){{ old('horaInicioEvento') }}
+                @else{{ '' }} @endif"><br>
+            </div>
+
+            <div class="col-6">
+                <label class="form-label">Data Fim Evento</label><br>
+                <input type="text" name="dataFimEvento" class="form-control"
+                    value="@if (!empty($dado->dataFimEvento)) {{ $dado->dataFimEvento }}
+                @elseif (!empty(old('dataFimEvento'))){{ old('dataFimEvento') }}
+                @else{{ '' }} @endif"><br>
+            </div>
+
+            <div class="col-6">
+                <label class="form-label">Hora Fim Evento</label><br>
+                <input type="text" name="horaFimEvento" class="form-control"
+                    value="@if (!empty($dado->horaFimEvento)) {{ $dado->horaFimEvento }}
+                @elseif (!empty(old('horaFimEvento'))){{ old('horaFimEvento') }}
+                @else{{ '' }} @endif"><br>
+            </div>
+
+
+            <div class="col-6">
+                <button type="submit" class="btn btn-success">Salvar</button>
+                <a href="{{ url('aluno') }}" class="btn btn-light">Voltar</a></button>
+            </div>
+        </form>
+
     </div>
-    <div class="form-group">
-        <label for="cpfAluno">CPF:</label>
-        <input type="text" class="form-control" id="cpfAluno" name="cpfAluno" value="{{ old('cpfAluno', $aluno->cpfAluno ?? '') }}" required>
-    </div>
-    <div class="form-group">
-        <label for="telefoneAluno">Telefone:</label>
-        <input type="text" class="form-control" id="telefoneAluno" name="telefoneAluno" value="{{ old('telefoneAluno', $aluno->telefoneAluno ?? '') }}" required>
-    </div>
-    <div class="form-group">
-        <label for="notaAluno">Nota:</label>
-        <input type="number" class="form-control" id="notaAluno" name="notaAluno" value="{{ old('notaAluno', $aluno->notaAluno ?? '') }}" required>
-    </div>
-    <div class="form-group">
-        <label for="turma">Turma:</label>
-        <input type="text" class="form-control" id="turma" name="turma" value="{{ old('turma', $aluno->turma ?? '') }}" required>
-    </div>
-    <div class="mb-3">
-        <input class="btn btn-success" type="submit" value="{{ $action === 'atualizar' ? 'Atualizar' : 'Adicionar' }}">
-    </div>
-</form>
-@endsection
+
+@stop
